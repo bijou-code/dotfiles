@@ -32,8 +32,8 @@ bind P paste-buffer
 ### DESIGN CHANGES ###
 ######################
 # color         code       used for
-# ------------  ---------  ----------------------------------------------------------------------
-# black         color000  currently commented out
+# ------------  --------  ----------------------------------------------------------------------
+# black         color000  inactive window titles, username
 # dark blue     color024  active window, message bg
 # blue          color031  window status background, message background, status background, clock
 # light blue    color039  active pane
