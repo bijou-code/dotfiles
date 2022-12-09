@@ -122,12 +122,9 @@ case ":$PATH:" in
   *) PATH="$PATH:$new_entry";; # or PATH="$PATH:$new_entry"
 esac
 
-
+set -o vi
 alias go-git='cd ~/Documents/git/'
-alias go-dnd='cd ~/Documents/git/D\&D/four-swords-master'
-alias go-exercise='cd ~/Documents/git/writing/exercise'
-alias go-journal='cd ~/Documents/git/writing/journal/'
+alias go-dnd='cd ~/Documents/git/four-swords'
 alias go-writing='cd ~/Documents/git/writing/'
-alias wine-prep='export MESA_GL_VERSION_OVERRIDE=4.5'
-alias wine-32='export WINEPREFIX="$HOME/.wine-32" && export WINEARCH=win32'
-alias wine-64='export WINEPREFIX="$HOME/.wine" && export WINEARCH=win64'
+alias go-journal='cd ~/Documents/git/writing/journal/'
+alias go-exercise='cd ~/Documents/git/writing/exercise'
