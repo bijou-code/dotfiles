@@ -18,12 +18,6 @@ bind - split-window -v
 unbind '"'
 unbind %
 
-# make changing panes easier (note that this conflicts with Emacs keybindings)
-bind -n M-Left select-pane -L
-bind -n M-Right select-pane -R
-bind -n M-Up select-pane -U
-bind -n M-Down select-pane -D
-
 # set up vi-style navigation and mousing in copy mode
 set -g status-keys vi
 set -g mouse on
