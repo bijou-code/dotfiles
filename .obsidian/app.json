@@ -4,5 +4,7 @@
   "newFileLocation": "current",
   "newLinkFormat": "relative",
   "useMarkdownLinks": true,
-  "vimMode": true
+  "vimMode": true,
+  "spellcheck": true,
+  "useTab": false
 }
