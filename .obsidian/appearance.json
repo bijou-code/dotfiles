@@ -2,5 +2,6 @@
   "accentColor": "#4682b4",
   "enabledCssSnippets": [
     "header-colors"
-  ]
+  ],
+  "baseFontSize": 14
 }
