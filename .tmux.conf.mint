@@ -10,6 +10,7 @@ bind-key ` send-prefix # this key sends the prefix (backtick) after the prefix i
 set -g escape-time 0 # time that tmux waits to determine if escape is a meta key sequence (slows things)
 set -g assume-paste-time 1 # do not trigger on paste. Redundant
 bind-key r source-file ~/.tmux.conf \; display "Updated configuration"
+bind-key p set-window-option synchronize-panes\; display-message "synchronize-panes: #{?pane_synchronized,on,off}"
 
 # make the pane-splitting commands easier to remember
 set -g base-index 1
@@ -32,8 +33,8 @@ bind P paste-buffer
 ### DESIGN CHANGES ###
 ######################
 # color         code       used for
-# ------------  ---------  ----------------------------------------------------------------------
-# black         color000  currently commented out
+# ------------  --------  ----------------------------------------------------------------------
+# black         color000  inactive window titles, username
 # dark blue     color024  active window, message bg
 # blue          color031  window status background, message background, status background, clock
 # light blue    color039  active pane
