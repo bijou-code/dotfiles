@@ -19,3 +19,12 @@ set shiftwidth=2 | " when indenting with '>', use 2 spaces
 set expandtab | " when tab is pressed, insert spaces
 
 set backspace=indent,eol,nostop | " allow backspacing past the start of the current insert
+
+" leader change
+let mapleader = ","
+
+" Easier pane switching
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
