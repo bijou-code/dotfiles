@@ -1,0 +1,10 @@
+#!/bin/sh
+
+for i in $(ls -d */); do 
+if cd "$i"; 
+  then 
+    echo "${PWD##*/}"
+    "$@"
+    cd - $1>/dev/null
+  fi
+done
