@@ -20,9 +20,10 @@ unbind '"'
 unbind %
 
 # set up vi-style navigation and mousing in copy mode
-set -g status-keys vi
-set -g mouse on
+setw -g status-keys vi
+setw -g mouse on
 setw -g mode-keys vi
+set-option -g history-limit 100000
 # set up vi-style selection and copy commands for copy mode
 bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "pbcopy"
 bind -T copy-mode-vi v send -X begin-selection

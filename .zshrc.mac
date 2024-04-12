@@ -19,6 +19,10 @@ source <(helm completion zsh)
 
 alias go-git='cd ~/Documents/git'
 alias mcist="mvn clean install -DskipTests -T 2C"
+alias k='kubectl'
+alias kc='kubectl --context'
+alias kn='kubectl -n'
+alias kconf='kubectl config'
 
 # colorize command prompt
 setopt PROMPT_SUBST
