@@ -22,6 +22,9 @@ set backspace=indent,eol,nostop | " allow backspacing past the start of the curr
 
 " leader change
 let mapleader = ","
+noremap <leader>w :w<cr>
+noremap <leader>r :source  ~/.vimrc<cr>
+noremap <leader>v :vs<cr>
 
 " Easier pane switching
 nnoremap <C-h> <C-w>h
