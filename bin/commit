@@ -3,5 +3,5 @@
 set -e
 
 git add --all
-git commit -m "${1:-"Sync: $(date)"}"
+git commit -m "${1:-"Sync: $(date -u)"}"
 git pull && git push
