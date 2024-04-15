@@ -2,6 +2,6 @@
 
 set -e
 
-git add .
-git commit -m "sync"
+git add --all
+git commit -m "${1:-"Sync: $(date)"}"
 git pull && git push
