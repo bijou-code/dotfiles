@@ -1,0 +1,4 @@
+FILE=$(date "+%Y-%m-%d").md
+
+printf "$(date)\n\n" >> ${FILE}
+vim '+normal Go' ${FILE}
