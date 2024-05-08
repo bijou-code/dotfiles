@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # WARNING:
 # Using the -p flag will attempt to pull the latest changes to your local branches

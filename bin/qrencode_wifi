@@ -37,4 +37,4 @@ read PASSWORD
 stty echo
 printf "\n"
 
-qrencode -t ${TYPE:-UTF8} -o ${OUTFILE:--} "WIFI:S:${SSID};H:${HIDDEN:-false};T:WPA;P:${PASSWORD};;"
+qrencode -t ${TYPE:-"UTF8"} -o ${OUTFILE:-"-"} "WIFI:S:${SSID};H:${HIDDEN:-"false"};T:WPA;P:${PASSWORD};;"
