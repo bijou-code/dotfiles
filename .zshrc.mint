@@ -2,13 +2,22 @@
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
+setopt INC_APPEND_HISTORY
+setopt HIST_SAVE_NO_DUPS
+
+# set vi input for commands
+set -o vi
 
 # Enable ZSH auto-complete
 autoload -Uz compinit; compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-# set vi input for commands
-set -o vi
+# colorize command prompt
+setopt PROMPT_SUBST
+export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
+
+# colorize ls
+export CLICOLOR="Yes"
 
 # convenience aliases
 alias ll="ls -lahF"
@@ -18,12 +27,6 @@ alias go-writing='cd ~/Documents/git/writings/'
 alias go-journal='cd ~/Documents/git/writings/journal/'
 alias go-exercise='cd ~/Documents/git/writings/exercise/'
 
-# colorize command prompt
-setopt INC_APPEND_HISTORY
-setopt HIST_SAVE_NO_DUPS
+alias findit='find . -not -path "*/\.*" -type f -print0 | xargs -0 grep --color=auto'
+alias my-ip='dig +short myip.opendns.com @resolver1.opendns.com'
 
-setopt PROMPT_SUBST
-export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
-
-# colorize ls
-export CLICOLOR="Yes"
