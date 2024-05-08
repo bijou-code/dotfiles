@@ -5,16 +5,28 @@ SAVEHIST=10000
 setopt INC_APPEND_HISTORY
 setopt HIST_SAVE_NO_DUPS
 
+# PATH additions
+export PATH="$HOME/bin:$PATH"
+
+# colorize command prompt
+setopt PROMPT_SUBST
+export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
+
+# set vi input for commands
+set -o vi
+
+# colorize ls
+export CLICOLOR="Yes"
+
 if type brew &>/dev/null; then
   FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
-
 fi
 
 # Enable ZSH auto-complete
 autoload -Uz compinit && compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-# Setup Brew
+# Init Brew
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Initialize jenv
@@ -39,15 +51,6 @@ alias kc='kubectl --context'
 alias kn='kubectl -n'
 alias kconf='kubectl config'
 
-# colorize command prompt
-setopt PROMPT_SUBST
-export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
-
-# set vi input for commands
-set -o vi
-
-# colorize ls
-export CLICOLOR="Yes"
 
 tf_check() {
     echo "Running terraform init..."
