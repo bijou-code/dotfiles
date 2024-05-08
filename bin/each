@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# PWD expansion explained here: https://mywiki.wooledge.org/BashGuide/Parameters#Parameter_Expansion
+
 for i in $(ls -d */); do
 if cd "$i";
   then
