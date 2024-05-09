@@ -12,9 +12,6 @@ set -o vi
 autoload -Uz compinit; compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 
-# PATH additions:
-export PATH="$HOME/bin:$PATH"
-
 # colorize command prompt
 setopt PROMPT_SUBST
 export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
