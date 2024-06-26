@@ -13,6 +13,10 @@ git config --global alias.staash 'stash --all'
 git config --global core.excludesfile ~/.gitignore
 ```
 
+# docker / kubernetes destination connectivity testing:
+```
+docker run -it --rm --name nginx -p 8080:80/tcp nginx:alpine
+```
 
 # shell scripting
 
@@ -26,4 +30,18 @@ docker run -it --rm debian sh -c 'apt update && apt install -y rlfe && rlfe dash
 Modification of the above.
 ``` sh
 docker run -it -v ~/scriptdir/:/data/bin/ --rm debian sh -c '/data/bin/script.sh arg1 arg2'
+```
+
+# Mac
+### Update launchpad grid count
+```
+defaults write com.apple.dock springboard-columns -int 10
+defaults write com.apple.dock springboard-rows -int 7
+killall Dock
+```
+and to reset:
+```
+defaults delete com.apple.dock springboard-columns
+defaults delete com.apple.dock springboard-rows
+killall Dock
 ```
