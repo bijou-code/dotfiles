@@ -12,6 +12,10 @@ git config --global alias.st 'status'
 git config --global alias.staash 'stash --all'
 git config --global core.excludesfile ~/.gitignore
 ```
+#### Git tricks
+```
+git clone -c "core.sshCommand=ssh -i ~/.ssh/id_ed25519_business" -c "user.email=daniel.register05@gmail.com" ... # alt id clone
+```
 
 # docker / kubernetes destination connectivity testing:
 ```
