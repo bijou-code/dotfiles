@@ -1,6 +1,6 @@
 {{- $email := promptStringOnce . "email" "Git email address" -}}
 {{- $name := promptStringOnce . "name" "Git name" -}}
-{{- $isWork := promptStringOnce . "isWork" "Work setup (y/n)" -}}
+{{- $isWork := promptChoiceOnce . "isWork" "Work setup (y/n)" (list "y" "n") -}}
 edit:
   command: 'vim'
 
