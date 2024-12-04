@@ -17,16 +17,22 @@ set -g base-index 1
 bind | split-window -h
 bind - split-window -v
 unbind '"'
-unbind %
+unbind '%'
 
 # set up vi-style navigation and mousing in copy mode
 set -g status-keys vi
 set -g mouse on
 setw -g mode-keys vi
 # set up vi-style selection and copy commands for copy mode
-bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xsel -b -i"
+{{- $clipboardCopy := "xsel -b -i" }}
+{{- if eq .chezmoi.os "windows" }}
+  {{- $clipboardCopy = "clip" }}
+{{- else if eq .chezmoi.os "darwin" }}
+  {{- $clipboardCopy = "pbcopy" }}
+{{- end }}
+bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "{{ $clipboardCopy }}"
 bind -T copy-mode-vi v send -X begin-selection
-bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "xsel -b -i"
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "{{ $clipboardCopy }}"
 bind P paste-buffer
 
 ######################
