@@ -1,0 +1,8 @@
+{{- $email := promptStringOnce . "email" "Git email address" -}}
+{{- $name := promptStringOnce . "name" "Git name" -}}
+edit:
+  command: 'vim'
+
+data:
+  email: {{ $email | quote }}
+  name: {{ $name | quote }}
