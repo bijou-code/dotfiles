@@ -11,6 +11,7 @@ set -o vi
 # Enable ZSH auto-complete
 autoload -Uz compinit; compinit
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+source <(kubectl completion zsh)
 
 # colorize command prompt
 setopt PROMPT_SUBST
@@ -30,3 +31,7 @@ alias go-exercise='cd ~/Documents/git/writings/exercise/'
 alias findit='find . -not -path "*/\.*" -type f -print0 | xargs -0 grep --color=auto'
 alias my-ip='dig +short myip.opendns.com @resolver1.opendns.com'
 
+alias k='kubectl'
+alias kn='kubectl -n'
+alias kconf='kubectl config'
+alias kctx='kubectl config use-context'
