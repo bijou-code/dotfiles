@@ -14,7 +14,7 @@ git config --global core.excludesfile ~/.gitignore
 ```
 #### Git tricks
 ```
-git clone -c "core.sshCommand=ssh -i ~/.ssh/id_ed25519_business" -c "user.email=daniel.register05@gmail.com" ... # alt id clone
+git clone -c "core.sshCommand=ssh -i ~/.ssh/id_ed25519_personal" -c "user.email=jedion9@gmail.com" git@github.com:bijou-code/dotfiles 
 ```
 
 # docker / kubernetes destination connectivity testing:
