@@ -1,0 +1,12 @@
+{{- $email := promptStringOnce . "email" "Git email address" -}}
+{{- $name := promptStringOnce . "name" "Git name" -}}
+{{- $isWork := promptChoiceOnce . "isWork" "Work setup (y/n)" (list "y" "n") -}}
+edit:
+  command: 'vim'
+
+data:
+  email: {{ $email | quote }}
+  name: {{ $name | quote }}
+{{- if contains "y" (lower $isWork) }}
+  work: true
+{{- end }}

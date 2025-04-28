@@ -1,0 +1,7 @@
+.inline-title {text-decoration: underline;}
+.markdown-rendered h1, .cm-header.cm-header-1 {color: steelblue; text-decoration: underline;}
+.markdown-rendered h2, .cm-header.cm-header-2 {color: lightseagreen; text-decoration: underline;}
+.markdown-rendered h3, .cm-header.cm-header-3 {color: darkseagreen;}
+.markdown-rendered h4, .cm-header.cm-header-4 {color: khaki;}
+.markdown-rendered h5, .cm-header.cm-header-5 {color: indianred;}
+.markdown-rendered h6, .cm-header.cm-header-6 {color: darksalmon;}

@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# TODO: allow partial commits rather than `add --all`. "add all" is the generally convenient behavior, but there are times when I have files I don't want to track + delete
+
+set -e
+
+git add --all
+git commit -m "${1:-"Sync: $(date -u)"}" || :
+git pull && git push

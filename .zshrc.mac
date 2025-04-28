@@ -1,0 +1,68 @@
+# set up zsh history
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt INC_APPEND_HISTORY
+setopt HIST_SAVE_NO_DUPS
+
+# PATH additions
+export PATH="$HOME/bin:$PATH"
+
+# colorize command prompt
+setopt PROMPT_SUBST
+export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
+
+# set vi input for commands
+set -o vi
+
+# colorize ls
+export CLICOLOR="Yes"
+
+if type brew &>/dev/null; then
+  FPATH=$(brew --prefix)/share/zsh-completions:$FPATH
+fi
+
+# Enable ZSH auto-complete
+autoload -Uz compinit && compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+# Init Brew
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# Initialize jenv
+eval "$(jenv init -)"
+
+# kubectl/helm auto-completion
+source <(kubectl completion zsh)
+source <(helm completion zsh)
+
+alias ll='ls -lah'
+alias go-git='cd ~/Documents/git'
+alias mcist="mvn clean install -DskipTests -T 2C"
+
+alias mci="mvn clean install"
+alias mcist="mvn clean install -DskipTests -T 2C"
+alias findit='find . -not -path "*/\.*" -type f -print0 | xargs -0 grep --color=auto'
+alias my-ip='dig +short myip.opendns.com @resolver1.opendns.com'
+
+alias tf='terraform'
+alias k='kubectl'
+alias kc='kubectl --context'
+alias kn='kubectl -n'
+alias kconf='kubectl config'
+
+
+tf_check() {
+    echo "Running terraform init..."
+    terraform init --upgrade
+
+    echo "Running terraform validate..."
+    terraform validate
+
+    echo "Running terraform fmt..."
+    terraform fmt
+
+    echo "Running terraform plan..."
+    terraform plan
+}
+

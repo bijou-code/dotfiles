@@ -10,41 +10,45 @@ bind-key ` send-prefix # this key sends the prefix (backtick) after the prefix i
 set -g escape-time 0 # time that tmux waits to determine if escape is a meta key sequence (slows things)
 set -g assume-paste-time 1 # do not trigger on paste. Redundant
 bind-key r source-file ~/.tmux.conf \; display "Updated configuration"
+bind-key p set-window-option synchronize-panes\; display-message "synchronize-panes: #{?pane_synchronized,on,off}"
 
 # make the pane-splitting commands easier to remember
 set -g base-index 1
 bind | split-window -h
 bind - split-window -v
 unbind '"'
-unbind %
-
-# make changing panes easier (note that this conflicts with Emacs keybindings)
-bind -n M-Left select-pane -L
-bind -n M-Right select-pane -R
-bind -n M-Up select-pane -U
-bind -n M-Down select-pane -D
+unbind '%'
 
 # set up vi-style navigation and mousing in copy mode
 set -g status-keys vi
 set -g mouse on
 setw -g mode-keys vi
 # set up vi-style selection and copy commands for copy mode
-bind-key -T copy-mode-vi 'v' send -X begin-selection     # Begin selection in copy mode.
-bind-key -T copy-mode-vi 'C-v' send -X rectangle-toggle  # Begin selection in copy mode.
-bind-key -T copy-mode-vi 'y' send -X copy-selection      # Yank selection in copy mode.
+{{- $clipboardCopy := "xsel -b -i" }}
+{{- if eq .chezmoi.os "windows" }}
+  {{- $clipboardCopy = "clip" }}
+{{- else if eq .chezmoi.os "darwin" }}
+  {{- $clipboardCopy = "pbcopy" }}
+{{- end }}
+bind -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "{{ $clipboardCopy }}"
+bind -T copy-mode-vi v send -X begin-selection
+bind -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "{{ $clipboardCopy }}"
+bind P paste-buffer
 
 ######################
 ### DESIGN CHANGES ###
 ######################
 # color         code       used for
-# ------------  ---------  ----------------------------------------------------------------------
-# black         color000  currently commented out
+# ------------  --------  ----------------------------------------------------------------------
+# black         color000  inactive window titles, username
+# dark blue     color024  active window, message bg
 # blue          color031  window status background, message background, status background, clock
+# light blue    color039  active pane
 # bright green  color048  activity/silence window trigger
 # dark red      color088  bell window trigger
 # grey          color232  inactive window status, message text
 # almost black  color235  pane inactive border, hostname in status
-# white         color255  current window status, pane active border, current time in status
+# white         color255  current window status, current time in status
 
 set -g default-terminal "screen-256color"
 
@@ -60,7 +64,7 @@ set -g bell-action none
 setw -g mode-style 'fg=black bg=white bold'
 
 # panes
-set -g pane-active-border-style 'fg=brightgreen bg=black'
+set -g pane-active-border-style 'fg=color039 bg=black'
 set -g pane-border-style 'fg=white,dim bg=black'
 
 # statusbar

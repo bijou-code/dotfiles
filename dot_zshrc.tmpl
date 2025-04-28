@@ -1,0 +1,69 @@
+# set up zsh history
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt INC_APPEND_HISTORY
+setopt HIST_SAVE_NO_DUPS
+
+# set vi input for commands
+set -o vi
+export PATH="$PATH:$HOME/bin"
+{{- if isExecutable "/opt/homebrew/bin/brew" }}
+eval "$(/opt/homebrew/bin/brew shellenv)"
+{{- else if isExecutable "/home/linuxbrew/.linuxbrew/bin/brew" }}
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+{{- end }}
+
+# Enable ZSH auto-complete
+autoload bashcompinit; bashcompinit
+autoload -Uz compinit; compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+{{- if lookPath "kubectl" }}
+source <(kubectl completion zsh)
+{{- end }}
+
+# colorize command prompt
+export CLICOLOR="Yes"
+setopt PROMPT_SUBST
+{{- if lookPath "git" }}
+export PROMPT='[%F{yellow}%* %F{green}%1~ %F{cyan}($(git symbolic-ref --short HEAD 2> /dev/null))%F{white}]%# '
+{{- else }}
+export PROMPT='[%F{yellow}%* %F{green}%1~%F{white}]%# '
+{{- end }}
+
+# convenience aliases
+alias ll="ls -lahF"
+alias go-git='cd ~/Documents/git/'
+{{- if not (index . "work") }}
+alias go-dnd='cd ~/Documents/git/four-swords/'
+alias go-writing='cd ~/Documents/git/writings/'
+alias go-journal='cd ~/Documents/git/writings/journal/'
+alias go-exercise='cd ~/Documents/git/writings/exercise/'
+{{- end }}
+
+alias findit='find . -not -path "*/\.*" -type f -print0 | xargs -0 grep --color=auto'
+alias my-ip='dig +short myip.opendns.com @resolver1.opendns.com'
+
+{{- if lookPath "kubectl" }}
+
+alias k='kubectl'
+alias kn='kubectl -n'
+alias kc='kubectl --context'
+alias kconf='kubectl config'
+alias kctx='kubectl config use-context'
+alias go-root='cd "$(git rev-parse --show-toplevel)"'
+{{- end }}
+{{- if lookPath "git" }}
+alias git_root='cd "$(git rev-parse --show-toplevel)"'
+alias git_make_executable='git update-index --chmod=+x '
+{{- end }}
+
+up () {
+  DIR=$(pwd | grep -Po "^.*${1:-$PWD}[^/]*")
+  cd "$DIR"
+}
+{{- if lookPath "kind" }}
+kind-reset () {
+  kind delete cluster --name "${1:="default"}" ; kind create cluster --name "$1" && kctx "kind-${1}" && k wait -A --for condition=Available deployment --all --timeout 90s
+}
+{{- end }}

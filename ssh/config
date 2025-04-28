@@ -1,0 +1,10 @@
+Host *.dev.*.network
+  RemoteCommand zsh -l
+  RequestTTY force
+Host bastion.*
+  IdentityFile ~/.ssh/id_ed25519.pub
+  ForwardAgent yes
+Host *.protected.*personal.network *.admin.*personal.network !bastion.*
+  ProxyCommand ssh $(echo %h | sed 's/^[^.]*/bastion01/g') -W %h:%p
+  IdentityFile ~/.ssh/id_ed25519.pub
+  ForwardAgent yes

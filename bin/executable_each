@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# PWD expansion explained here: https://mywiki.wooledge.org/BashGuide/Parameters#Parameter_Expansion
+
+while IFS='' read -r -d '' i; do 
+if cd "$i";
+  then
+    echo "# ${PWD##*/}/"
+    "$@"
+    cd - 1>/dev/null
+  fi
+done < <(find . -maxdepth 1 -not -name "\.*" -type d -print0)

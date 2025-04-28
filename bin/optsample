@@ -1,0 +1,116 @@
+#!/bin/sh
+
+# WARNING:
+# Using the -p flag will attempt to pull the latest changes to your local branches
+# if they exist on the 'origin' remote and there are no staged or unstaged changes.
+
+set -e
+
+usage() {
+  echo "Usage: $0 [OPTIONS]"
+  echo "Build schema-tool, core, and server with Maven"
+  echo
+  echo "  -p, Pull the latest changes from origin to core, schema-tool, and server"
+  echo "  -m, Run database migrations"
+  echo "  -t, Use test tables/migrations for database"
+  echo "  -d, Build dependencies only"
+  echo "  -a, Assemble cos for deployment"
+  echo "  -i, Do incremental builds"
+  exit 1
+}
+
+# options
+pull=false
+migrate=false
+testdb=false
+dependencies_only=false
+assemble_server=false
+incremental_builds=false
+
+# parse arguments
+while getopts ":pmdait" opt; do
+  case "${opt}" in
+    p)  pull=true;;
+    m)  migrate=true;;
+    t)  testdb=true;;
+    d)  dependencies_only=true;;
+    a)  assemble_server=true;;
+    i)  incremental_builds=true;;
+    *)  usage;;
+  esac
+done
+
+# locate directories
+if [ -z "$SERVERDIR" ]; then
+  SERVERDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+fi
+
+if [ -z "$BASESRCDIR" ]; then
+  BASESRCDIR="$( cd "$( dirname "$( dirname ${SERVERDIR})" )" && pwd )"
+fi
+
+core="core"
+if [ ! -d "$BASESRCDIR/$core" ]; then
+  # try to find existing core if apps are cloned
+  core="apps/${core}"
+  if [ ! -d "$BASESRCDIR/$core" ]; then
+    echo "Can't find core directory"
+    exit 1
+  fi
+fi
+
+if [ ! -d "$BASESRCDIR/schema-tool" ]; then
+  echo "Can't find schema-tool directory"
+  exit 1
+fi
+
+# set Maven options for Macs running Sun JDK
+export MAVEN_OPTS="-Xmx2048M -XX:MaxMetaspaceSize=256m"
+
+# define the order of dependencies
+declare -a repos=(
+  'schema-tool'
+  ${core}
+  'server'
+)
+
+# pull repos
+if [ "$pull" == true ] ; then
+  for repo in "${repos[@]}"; do
+    cd ${BASESRCDIR}/${repo}
+    if [[ -z "$(git status -s -uno)" ]]; then
+      branch="$( git rev-parse --abbrev-ref HEAD )"
+      branch_exists="$( git ls-remote --heads origin ${branch} | wc -l )"
+
+      if [ "$branch_exists" -eq 1 ]; then
+        git pull origin ${branch}
+      fi
+    fi
+  done
+fi
+
+# apply migrations
+if [ "$migrate" == true ] ; then
+  if [ "$testdb" == true ] ; then
+    db/migrate apply --test --mysql-host=0.0.0.0
+  else
+    db/migrate apply --mysql-host=0.0.0.0
+  fi
+fi
+
+# we can save time by building dependencies only,
+# since most people build server with IntelliJ
+if [ "$dependencies_only" == true ] ; then
+  unset repos[2]
+fi
+
+clean_run="clean"
+if $incremental_builds ;  then
+  clean_run=""
+fi
+
+# build repos
+for repo in "${repos[@]}"; do
+  cd ${BASESRCDIR}/${repo}
+  mvn -T 4 -DskipAssembly=${assemble_server} -D skipTests ${clean_run} install
+done

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+if [ "$(uname -s)" = "Darwin" ]; then
+  open -na "IntelliJ IDEA.app" --args "${1:-"."}"
+else
+  echo "not yet implemented for cygwin / linux hosts"
+  exit 1
+fi

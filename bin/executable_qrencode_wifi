@@ -1,0 +1,40 @@
+#!/bin/sh
+
+usage() {
+cat << EOF
+Usage:
+  Do note that this assumes you are using WPA2/3 (personal). If you aren't using WPA, this helper is not for you.
+
+  -h  Help / usage text. Displays this output and exits
+  -H  Hidden. Use this flag if the wifi ssid is hidden
+  -n  Network name (SSID). Will request if missing
+  -o  Output file. Will output to stdout if not provided.
+  -t  Output filetype. Default: UTF8. One of: PNG,PNG32,EPS,SVG,XPM,ANSI,ANSI256,ASCII,ASCIIi,UTF8,UTF8i,ANSIUTF8,ANSIUTF8i,ANSI256UTF8
+EOF
+}
+
+while getopts "hHo:n:t:" opt; do
+  case "${opt}" in
+    h) usage; exit 0;;
+    H) HIDDEN=true;;
+    o) OUTFILE=${OPTARG};;
+    n) SSID=${OPTARG};;
+    t) TYPE=${OPTARG};;
+    *) usage; exit 1;;
+  esac
+done
+
+# Get SSID if not provided
+if [ -z SSID ]; then
+  printf "SSID: "
+  read SSID
+fi
+
+# read password without exposing to history or user
+stty -echo
+printf "Password: "
+read PASSWORD
+stty echo
+printf "\n"
+
+qrencode -t ${TYPE:-"UTF8"} -o ${OUTFILE:-"-"} "WIFI:S:${SSID};H:${HIDDEN:-"false"};T:WPA;P:${PASSWORD};;"
