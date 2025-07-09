@@ -1,0 +1,4 @@
+# Do not copy these to the local installation
+ssh/
+ssh/**
+helpful-one-liners.md
