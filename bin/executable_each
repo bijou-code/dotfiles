@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # PWD expansion explained here: https://mywiki.wooledge.org/BashGuide/Parameters#Parameter_Expansion
 

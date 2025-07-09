@@ -41,29 +41,45 @@ alias go-journal='cd ~/Documents/git/writings/journal/'
 alias go-exercise='cd ~/Documents/git/writings/exercise/'
 {{- end }}
 
-alias findit='find . -not -path "*/\.*" -type f -print0 | xargs -0 grep --color=auto'
 alias my-ip='dig +short myip.opendns.com @resolver1.opendns.com'
+alias no='grep -viE'
+{{- if not (lookPath "rg") }}
+alias findit='find . -not -path "*/\.*" -type f -print0 | xargs -0 grep --color=auto'
+{{- end }}
 
 {{- if lookPath "kubectl" }}
-
 alias k='kubectl'
 alias kn='kubectl -n'
 alias kc='kubectl --context'
 alias kconf='kubectl config'
 alias kctx='kubectl config use-context'
-alias go-root='cd "$(git rev-parse --show-toplevel)"'
 {{- end }}
 {{- if lookPath "git" }}
 alias git_root='cd "$(git rev-parse --show-toplevel)"'
 alias git_make_executable='git update-index --chmod=+x '
 {{- end }}
+{{- if lookPath "terraform"}}
+alias tf='terraform'
+{{- else if lookPath "tofu"}}
+alias tf='tofu'
+{{- end }}
+{{- if lookPath "mvn"}}
+alias mci="mvn clean install"
+alias mcist="mvn clean install -DskipTests -T 2C"
+{{- end }}
 
 up () {
-  DIR=$(pwd | grep -Po "^.*${1:-$PWD}[^/]*")
+  DIR=$(pwd | grep -Eo "^.*${1:-$PWD}[^/]*")
   cd "$DIR"
 }
 {{- if lookPath "kind" }}
 kind-reset () {
-  kind delete cluster --name "${1:="default"}" ; kind create cluster --name "$1" && kctx "kind-${1}" && k wait -A --for condition=Available deployment --all --timeout 90s
+  kind delete cluster --name "${1:="default"}" ; kind create cluster --name "$1" "${@:2}" && kctx "kind-${1}" && k wait -A --for condition=Available deployment --all --timeout 90s
+}
+{{- end }}
+
+{{- if lookPath "aws" }}
+ssm() {
+  aws ssm start-session --target "${1}" --document-name AWS-StartInteractiveCommand --parameters command="bash -l"
 }
 {{- end }}
