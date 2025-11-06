@@ -69,8 +69,7 @@ alias mcist="mvn clean install -DskipTests -T 2C"
 {{- end }}
 
 up () {
-  DIR=$(pwd | grep -Eo "^.*${1:-$PWD}[^/]*")
-  cd "$DIR"
+  cd "$(pwd | grep -Eo "^.*${1:-$PWD}[^/]*")"
 }
 {{- if lookPath "kind" }}
 kind-reset () {
