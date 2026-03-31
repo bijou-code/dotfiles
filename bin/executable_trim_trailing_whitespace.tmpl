@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sed -i {{ if eq .chezmoi.os "darwin" }}'' {{ end -}} -e 's/[[:space:]]*$//' "$@"
