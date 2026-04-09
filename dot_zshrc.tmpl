@@ -13,6 +13,9 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 {{- else if isExecutable "/home/linuxbrew/.linuxbrew/bin/brew" }}
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 {{- end }}
+{{- if lookPath "goenv" }}
+eval "$(goenv init -)"
+{{- end }}
 
 # Enable ZSH auto-complete
 autoload bashcompinit; bashcompinit
