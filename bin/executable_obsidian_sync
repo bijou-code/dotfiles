@@ -1,7 +1,36 @@
 #!/bin/bash
 
-if command chezmoi -v 1>/dev/null 2>&1 && [ -d .obsidian ]; then
-  cp -R "$(chezmoi source-path)/.obsidian" .
-else
+usage() {
+cat << EOF
+This utility is for sharing obsidian configuration between arbitrary vaults, using chezmoi as a bus.
+This utility checks for a '.obsidian' directory before executing as a safety measure.
+
+Usage:
+  -d diff: print the diff between the current and chezmoi copies of the obsidian directory
+  -r Reverse: instead of copying the chezmoi content over the current directory, it copies the
+     contents of the current directory over top of the chezmoi content.
+EOF
+}
+
+while getopts "drh" opt; do
+  case "${opt}" in
+    d) DIFF=true;;
+    r) REVERSE=true;;
+    h) usage; exit 0;;
+    *) usage; exit 1;;
+  esac
+done
+
+if ! [ -d .obsidian ] || ! command chezmoi --version 1>/dev/null 2>&1; then
   echo "Either Chezmoi is not installed, or this is not an obsidian vault directory"
+  exit 1
+fi
+
+if ! [ -z "${REVERSE+x}" ]; then
+  cp -R .obsidian "$(chezmoi source-path)"
+elif ! [ -z "${DIFF+x}" ]; then
+  echo "< .obsidian, > chezmoi"
+  diff .obsidian "$(chezmoi source-path)/.obsidian" -ry
+else
+  cp -R "$(chezmoi source-path)/.obsidian" .
 fi
