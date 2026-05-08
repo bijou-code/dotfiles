@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if command chezmoi -v 1>/dev/null 2>&1 && [ -d .obsidian ]; then
+  cp -R "$(chezmoi source-path)/.obsidian" .
+else
+  echo "Either Chezmoi is not installed, or this is not an obsidian vault directory"
+fi

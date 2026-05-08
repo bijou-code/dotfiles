@@ -24,6 +24,9 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 {{- if lookPath "kubectl" }}
 source <(kubectl completion zsh)
 {{- end }}
+{{- if lookPath "rustup" }}
+export PATH="$PATH:$(brew --prefix rustup)/bin:$HOME/.cargo/bin"
+{{- end }}
 
 # colorize command prompt
 export CLICOLOR="Yes"
@@ -60,6 +63,7 @@ alias kctx='kubectl config use-context'
 {{- if lookPath "git" }}
 alias git_root='cd "$(git rev-parse --show-toplevel)"'
 alias git_make_executable='git update-index --chmod=+x '
+git_submodule_each() { git submodule foreach $@; $@ }
 {{- end }}
 {{- if lookPath "terraform"}}
 alias tf='terraform'
