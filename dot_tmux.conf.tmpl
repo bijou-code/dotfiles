@@ -71,7 +71,6 @@ set -g pane-border-style 'fg=white,dim bg=black'
 set -g status-position bottom
 set -g status-justify left
 set -g status-style 'bg=color031 fg=white'
-set -g status-left '' # add a space on the left to improve readability
 set -g status-right "#[fg=colour088]#S #[fg=colour232]#h #[fg=colour255]%r"
 set -g status-right-length 50
 set -g status-left-length 20
@@ -85,4 +84,5 @@ setw -g window-status-activity-style 'fg=color048,bg=color031'
 setw -g window-status-bell-style 'fg=color088 bg=color031 bold'
 
 # messages
-set -g message-style 'fg=color255 bg=color024 bright'
+set -g message-style 'fg=color255,bg=color024,bright,fill=color024,width=100%'
+set -g message-command-style 'fg=color220,bg=color024,bold,fill=color024,width=100%'
