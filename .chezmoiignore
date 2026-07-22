@@ -2,3 +2,15 @@
 ssh/
 ssh/**
 helpful-one-liners.md
+
+{{- if not (lookPath "git") }}
+# Git worktree helpers
+bin/gb
+bin/git-worktree-path
+bin/gwa
+bin/gwd
+bin/gwl
+.config/zsh/functions/gwa.zsh
+.config/zsh/functions/gwc.zsh
+.config/zsh/functions/gwd.zsh
+{{- end }}

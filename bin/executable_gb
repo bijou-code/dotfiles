@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+usage() {
+  echo "Usage: gb <branch-substring>" >&2
+}
+
+if [[ ${1:-} == --resolve ]]; then
+  resolve=true
+  shift
+else
+  resolve=false
+fi
+
+if [[ $# -ne 1 || -z $1 ]]; then
+  usage
+  exit 2
+fi
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "gb: not inside a Git repository" >&2
+  exit 2
+fi
+
+query=$1
+local_matches=()
+remote_matches=()
+
+while IFS=$'\t' read -r ref symref; do
+  case $ref in
+    refs/heads/*)
+      branch=${ref#refs/heads/}
+      [[ $branch == *"$query"* ]] && local_matches+=("$branch")
+      ;;
+    refs/remotes/*)
+      branch=${ref#refs/remotes/}
+      [[ -z $symref && $branch == *"$query"* ]] && remote_matches+=("$branch")
+      ;;
+  esac
+done < <(git for-each-ref --format='%(refname)%09%(symref)' refs/heads refs/remotes)
+
+if ! $resolve; then
+  [[ ${#local_matches[@]} -gt 0 ]] && printf '%s\n' "${local_matches[@]}"
+  [[ ${#remote_matches[@]} -gt 0 ]] && printf '%s\n' "${remote_matches[@]}"
+  [[ ${#local_matches[@]} -gt 0 || ${#remote_matches[@]} -gt 0 ]] || exit 1
+  exit 0
+fi
+
+# An exact displayed ref wins. Otherwise, prefer local matches over remotes.
+for branch in "${local_matches[@]}"; do
+  if [[ $branch == "$query" ]]; then
+    printf 'local\t%s\n' "$branch"
+    exit 0
+  fi
+done
+
+for branch in "${remote_matches[@]}"; do
+  if [[ $branch == "$query" ]]; then
+    printf 'remote\t%s\n' "$branch"
+    exit 0
+  fi
+done
+
+if [[ ${#local_matches[@]} -gt 0 ]]; then
+  kind=local
+  candidates=("${local_matches[@]}")
+else
+  kind=remote
+  candidates=("${remote_matches[@]}")
+fi
+
+if [[ ${#candidates[@]} -eq 1 ]]; then
+  printf '%s\t%s\n' "$kind" "${candidates[0]}"
+  exit 0
+elif [[ ${#candidates[@]} -eq 0 ]]; then
+  echo "gb: no branch matches '$query'" >&2
+  exit 1
+fi
+
+echo "gb: '$query' is ambiguous; matching branches:" >&2
+printf '  %s\n' "${candidates[@]}" >&2
+exit 2

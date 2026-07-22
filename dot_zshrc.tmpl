@@ -24,6 +24,9 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 {{- if lookPath "kubectl" }}
 source <(kubectl completion zsh)
 {{- end }}
+{{- if lookPath "docker" }}
+source <(docker completion zsh)
+{{- end }}
 {{- if lookPath "rustup" }}
 export PATH="$PATH:$(brew --prefix rustup)/bin:$HOME/.cargo/bin"
 {{- end }}
@@ -64,6 +67,10 @@ alias kctx='kubectl config use-context'
 alias git_root='cd "$(git rev-parse --show-toplevel)"'
 alias git_make_executable='git update-index --chmod=+x '
 git_submodule_each() { git submodule foreach $@; $@ }
+for zsh_function_file in "$HOME/.config/zsh/functions/"*.zsh(N); do
+  source "$zsh_function_file"
+done
+unset zsh_function_file
 {{- end }}
 {{- if lookPath "terraform"}}
 alias tf='terraform'

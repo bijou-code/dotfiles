@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+caller=${GIT_WORKTREE_PATH_CALLER:-git-worktree-path}
+managed_only=false
+
+if [[ ${1:-} == --main ]]; then
+  if [[ $# -ne 1 ]]; then
+    echo "Usage: $caller --main" >&2
+    exit 2
+  fi
+  main_only=true
+  shift
+else
+  main_only=false
+fi
+
+if [[ ${1:-} == --managed ]]; then
+  managed_only=true
+  shift
+fi
+
+if ! $main_only && [[ $# -ne 1 || -z $1 ]]; then
+  echo "Usage: $caller <worktree-substring>" >&2
+  exit 2
+fi
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "$caller: not inside a Git repository" >&2
+  exit 2
+fi
+
+paths=()
+branches=()
+
+# -z keeps paths with spaces unquoted and unambiguous.
+while IFS= read -r -d '' field; do
+  case $field in
+    worktree\ *)
+      paths+=("${field#worktree }")
+      branches+=("")
+      ;;
+    branch\ refs/heads/*)
+      branches[${#branches[@]}-1]=${field#branch refs/heads/}
+      ;;
+  esac
+done < <(git worktree list --porcelain -z)
+
+if [[ ${#paths[@]} -eq 0 ]]; then
+  echo "$caller: could not determine the main worktree" >&2
+  exit 2
+fi
+
+main_worktree=${paths[0]}
+if $main_only; then
+  printf '%s\n' "$main_worktree"
+  exit 0
+fi
+
+query=$1
+repo_parent=${main_worktree%/*}
+repo_name=${main_worktree##*/}
+managed_root="$repo_parent/${repo_name}-worktrees"
+exact_paths=()
+exact_labels=()
+match_paths=()
+match_labels=()
+
+for ((i = 0; i < ${#paths[@]}; i++)); do
+  path=${paths[i]}
+  if $managed_only; then
+    case $path in
+      "$managed_root"/*) ;;
+      *) continue ;;
+    esac
+  fi
+
+  directory=${path##*/}
+  branch=${branches[i]:-$directory}
+  label=$branch
+  if [[ $directory != "$branch" ]]; then
+    label="$branch ($directory)"
+  fi
+
+  if [[ $branch == "$query" || $directory == "$query" ]]; then
+    exact_paths+=("$path")
+    exact_labels+=("$label")
+  elif [[ $branch == *"$query"* || $directory == *"$query"* ]]; then
+    match_paths+=("$path")
+    match_labels+=("$label")
+  fi
+done
+
+if [[ ${#exact_paths[@]} -gt 0 ]]; then
+  candidate_paths=("${exact_paths[@]}")
+  candidate_labels=("${exact_labels[@]}")
+else
+  candidate_paths=("${match_paths[@]}")
+  candidate_labels=("${match_labels[@]}")
+fi
+
+if [[ ${#candidate_paths[@]} -eq 1 ]]; then
+  printf '%s\n' "${candidate_paths[0]}"
+  exit 0
+fi
+
+if [[ ${#candidate_paths[@]} -eq 0 ]]; then
+  echo "$caller: no worktree matches '$query'" >&2
+  exit 1
+fi
+
+echo "$caller: '$query' is ambiguous; matching worktrees:" >&2
+for ((i = 0; i < ${#candidate_paths[@]}; i++)); do
+  printf '  %s -> %s\n' "${candidate_labels[i]}" "${candidate_paths[i]}" >&2
+done
+exit 2

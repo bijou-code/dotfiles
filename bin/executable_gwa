@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+usage() {
+  echo "Usage: gwa <branch-substring> [worktree-directory-name]" >&2
+}
+
+if [[ $# -lt 1 || $# -gt 2 || -z $1 || ( $# -eq 2 && -z $2 ) ]]; then
+  usage
+  exit 2
+fi
+
+if [[ $# -eq 2 ]]; then
+  worktree_name=$2
+  case "/$worktree_name/" in
+    */../*|*/./*)
+      echo "gwa: worktree directory name must stay within the dedicated worktree directory" >&2
+      exit 2
+      ;;
+  esac
+  if [[ $worktree_name == /* ]]; then
+    echo "gwa: worktree directory name must be relative" >&2
+    exit 2
+  fi
+fi
+
+repo_root=$(GIT_WORKTREE_PATH_CALLER=gwa git-worktree-path --main) || exit $?
+
+resolved=$(gb --resolve "$1") || exit $?
+
+kind=${resolved%%$'\t'*}
+ref=${resolved#*$'\t'}
+
+repo_parent=${repo_root%/*}
+repo_name=${repo_root##*/}
+worktree_root="$repo_parent/${repo_name}-worktrees"
+
+if [[ $kind == local ]]; then
+  branch=$ref
+  destination="$worktree_root/${worktree_name:-$branch}"
+  git worktree add "$destination" "$branch"
+elif [[ $kind == remote ]]; then
+  branch=${ref#*/}
+  destination="$worktree_root/${worktree_name:-$branch}"
+  git worktree add --track -b "$branch" "$destination" "$ref"
+else
+  echo "gwa: gb returned an unknown branch type: $kind" >&2
+  exit 2
+fi
+
+printf 'Worktree ready at %s\n' "$destination"

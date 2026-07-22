@@ -1,0 +1,40 @@
+#!/bin/bash
+
+if [ "$#" -lt 2 ]; then
+    echo "Usage: $0 <search_term> <replacement_string> [ripgrep_args...]"
+    echo "Example: $0 'old-api' 'new-api' --type rust"
+    exit 1
+fi
+
+SEARCH_TERM=$1
+REPLACE_TERM=$2
+shift 2
+
+FILES=()
+while IFS= read -r -d '' FILE; do
+    FILES+=("$FILE")
+done < <(rg -0 -lF "$@" -- "${SEARCH_TERM}" .)
+
+if [ "${#FILES[@]}" -eq 0 ]; then
+    echo "No matching files found."
+    exit 0
+fi
+
+echo "Affected files:"
+printf '  %s\n' "${FILES[@]}"
+echo
+
+read -r -p "Does this look right? [y/N] " CONFIRM
+case "$CONFIRM" in
+    y|Y) ;;
+    *)
+        echo "Aborted."
+        exit 0
+        ;;
+esac
+
+# Escape the fixed-string search and replacement before building the sed command.
+SED_SEARCH=$(printf '%s' "$SEARCH_TERM" | sed 's/[][\\.^$*|]/\\&/g')
+SED_REPLACE=$(printf '%s' "$REPLACE_TERM" | sed 's/[\\&|]/\\&/g')
+
+printf '%s\0' "${FILES[@]}" | xargs -0 sed -i '' "s|${SED_SEARCH}|${SED_REPLACE}|g"

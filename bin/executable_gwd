@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e -o pipefail
+
+usage() {
+  echo "Usage: gwd <branch-substring>" >&2
+}
+
+if [[ $# -ne 1 || -z $1 ]]; then
+  usage
+  exit 2
+fi
+
+target=$(GIT_WORKTREE_PATH_CALLER=gwd git-worktree-path --managed "$1") || exit $?
+
+git worktree remove "$target"
+printf 'Removed worktree %s\n' "$target"
