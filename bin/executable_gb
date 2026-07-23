@@ -47,7 +47,7 @@ if ! $resolve; then
   exit 0
 fi
 
-# An exact displayed ref wins. Otherwise, prefer local matches over remotes.
+# Prefer exact local and fully qualified remote refs.
 for branch in "${local_matches[@]}"; do
   if [[ $branch == "$query" ]]; then
     printf 'local\t%s\n' "$branch"
@@ -55,13 +55,28 @@ for branch in "${local_matches[@]}"; do
   fi
 done
 
+exact_remote_matches=()
 for branch in "${remote_matches[@]}"; do
   if [[ $branch == "$query" ]]; then
     printf 'remote\t%s\n' "$branch"
     exit 0
+  elif [[ ${branch#*/} == "$query" ]]; then
+    exact_remote_matches+=("$branch")
   fi
 done
 
+# An exact branch name wins over longer substring matches. If it exists on
+# multiple remotes, require the caller to include the remote name.
+if [[ ${#exact_remote_matches[@]} -eq 1 ]]; then
+  printf 'remote\t%s\n' "${exact_remote_matches[0]}"
+  exit 0
+elif [[ ${#exact_remote_matches[@]} -gt 1 ]]; then
+  echo "gb: '$query' exists on multiple remotes; use a fully qualified branch:" >&2
+  printf '  %s\n' "${exact_remote_matches[@]}" >&2
+  exit 2
+fi
+
+# With no exact match, prefer local substring matches over remote matches.
 if [[ ${#local_matches[@]} -gt 0 ]]; then
   kind=local
   candidates=("${local_matches[@]}")
