@@ -7,28 +7,58 @@ setopt HIST_SAVE_NO_DUPS
 
 # set vi input for commands
 set -o vi
-export PATH="$PATH:$HOME/bin"
+typeset -U path fpath manpath
+typeset -TU INFOPATH infopath
+export INFOPATH
+path+=("$HOME/bin")
 {{- if isExecutable "/opt/homebrew/bin/brew" }}
-eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_PREFIX="/opt/homebrew"
+export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+export HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX"
+path=("$HOMEBREW_PREFIX/bin" "$HOMEBREW_PREFIX/sbin" $path)
+fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
+manpath=("$HOMEBREW_PREFIX/share/man" $manpath "")
+infopath=("$HOMEBREW_PREFIX/share/info" $infopath "")
 {{- else if isExecutable "/home/linuxbrew/.linuxbrew/bin/brew" }}
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+export HOMEBREW_PREFIX="/home/linuxbrew/.linuxbrew"
+export HOMEBREW_CELLAR="$HOMEBREW_PREFIX/Cellar"
+export HOMEBREW_REPOSITORY="$HOMEBREW_PREFIX/Homebrew"
+path=("$HOMEBREW_PREFIX/bin" "$HOMEBREW_PREFIX/sbin" $path)
+fpath=("$HOMEBREW_PREFIX/share/zsh/site-functions" $fpath)
+manpath=("$HOMEBREW_PREFIX/share/man" $manpath "")
+infopath=("$HOMEBREW_PREFIX/share/info" $infopath "")
 {{- end }}
 {{- if lookPath "goenv" }}
 eval "$(goenv init -)"
 {{- end }}
 
 # Enable ZSH auto-complete
-autoload bashcompinit; bashcompinit
-autoload -Uz compinit; compinit
+autoload -Uz compinit
+zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+stale_zcompdump=( ${~zcompdump}(N.mh+24) )
+if [[ ! -e $zcompdump || ${#stale_zcompdump[@]} -gt 0 ]]; then
+  compinit -d "$zcompdump"
+  touch "$zcompdump"
+else
+  compinit -C -d "$zcompdump"
+fi
+unset zcompdump stale_zcompdump
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
 {{- if lookPath "kubectl" }}
+if (( ! ${+_comps[kubectl]} )); then
 source <(kubectl completion zsh)
+fi
 {{- end }}
 {{- if lookPath "docker" }}
+if (( ! ${+_comps[docker]} )); then
 source <(docker completion zsh)
+fi
 {{- end }}
 {{- if lookPath "rustup" }}
-export PATH="$PATH:$(brew --prefix rustup)/bin:$HOME/.cargo/bin"
+{{- if or (isExecutable "/opt/homebrew/bin/brew") (isExecutable "/home/linuxbrew/.linuxbrew/bin/brew") }}
+path+=("$HOMEBREW_PREFIX/opt/rustup/bin")
+{{- end }}
+path+=("$HOME/.cargo/bin")
 {{- end }}
 
 # colorize command prompt
