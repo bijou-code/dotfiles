@@ -1,16 +1,18 @@
 [user]
-	email = {{ .email }} 
-	name = {{ .name }}
+  email = {{ .email }} 
+  name = {{ .name }}
 [core]
-	editor = vim
-	excludesfile = ~/.gitignore
+  editor = vim
+  excludesfile = ~/.gitignore
 [push]
-	autoSetupRemote = true
-[pull]
-	rebase = false
+  autoSetupRemote = true
 [alias]
-	aa = add --all
-	diffs = diff --staged
-	st = status
-	staash = stash --all
-  wls = worktree list
+  aa = add --all
+  diffs = diff --staged
+  st = status
+  staash = stash --all
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
